@@ -6,7 +6,7 @@ import {
   Transfer
 } from '../types/ERC20/Token'
 
-const zeroBD = BigDecimal.fromString('0')
+let zeroBD = BigDecimal.fromString('0')
 
 function createUser(
   userId: string
