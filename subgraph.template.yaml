@@ -15,7 +15,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
-      file: ./src/mappings/token.ts
+      file: ./src/mappings/events.ts
       entities:
         - User
         - Asset
@@ -23,5 +23,7 @@ dataSources:
         - name: Token
           file: ./abis/token.json
       eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
