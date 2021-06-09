@@ -1,138 +1,75 @@
-# DeFi Balance Subgraph
+# ERC20 Template Subgraph
 
 ## Description
-This subgraph tracks the token balances of the most popular DeFi tokens and presents them in a easily queriable manner. The assets we currently track are: 
-
-- Stable Coin Tokens: DAI, USDC, USDT, TUSD, BUSD
-- Lending Tokens: MKR, COMP, AAVE, LQTY, ALPHA, ALCX
-- DEX Tokens: UNI, CRV, BAL, SUSHI, BNT, LRC
-- Derivatives Tokens: SNX, NXM, BOND, HEGIC, FST, DDX
-- Asset Manager Tokens: YFI, VSP, BADGER, REN, FARM
-- Payment Tokens: MATIC, TORN, STAKE
+This subgraph template enables developers to track  balances and approvals for ERC20 tokens.
 
 ## Useful Links
 
-Subgraph is hosted at: https://thegraph.com/explorer/subgraph/valve-finance/defi-balance
-
-Subgraph API can be queried at: https://api.thegraph.com/subgraphs/name/valve-finance/defi-balance
+Example Subgraph is hosted at: https://thegraph.com/explorer/subgraph/valve-finance/erc20. You can also try below queries in the playground.
 
 
 ## Build Instructions
-1. Replace `$YOUR_SUB_GRAPH` with the name of your subgraph
-2. Replace `$YOUR_GRAPH_ACCESS_TOKEN` with your access token
-3. Run below commands:
 ```
-    yarn
-    yarn codegen
-    yarn build
-    yarn deploy
+# copy env and adjust its content
+# you can get an access token from https://thegraph.com/explorer/dashboard
+cp .env.test .env
+# edit config/mainnet.json file and add your desired ERC20 contract & corresponding start block for indexing
+yarn
+# creates a subgraph.yml file with desired contract and start block information specified in config file
+yarn prepare:mainnet
+yarn codegen
+yarn build
+yarn deploy
 ```
 
 ## Features & Capabilities
-Given up to a 1000 wallet addresses, and a block ID, we will return the token balances of the DeFi pulse index for those wallets. You can also cut it by category: lending, DEXs, Derivatives, Assets. 
+Here are a few examples of types of queries that can be run:
 
-Below are a few examples of types of queries that can be run:
-
-### Get all supported assets
+### Get asset information for your ERC20 token
 ```
 {
-  assets(first: 100) {
+  assets(first: 1) {
     id
     name
     symbol
     decimals
-    category
   }
 }
 ```
 
-### Get Top 100 holders of a given asset
+### Get a user's token balance
 ```
 {
-  accountTokens (
-    first: 100
-    orderBy: balance
-    orderDirection: desc
-    where: {
-      balance_gt: 0
-      symbol: "DAI"
-    }
-  ) {
-    userID
+  user(id: "0x574300348823910c6f82a6a3d859791b9cd0310e") {
     balance
   }
 }
 ```
 
-### Get balance of DPI assets for given list of wallets (up to 1000 wallets)
+### Time travel query: get token balance at specified block number
 ```
 {
-  accounts (
-    where: {
-      id_in: [
-        "0x0000000000007f150bd6f54c40a34d7c3d5e9f56",
-        "0x00000000b7ca7e12dcc72290d1fe47b2ef14c607",
-        "0x0000006daea1723962647b7e189d311d757fb793"
-      ]
-    }
-  ) {
-    id
-    tokens (
-      where: {
-        balance_gt: 0
-      }
-    ) {
-      symbol
-      balance
-    }
-  }
-}
-```
-
-### Get balance for a category of assets
-```
-{
-  accounts (
-    where: {
-      id_in: [
-        "0x0000000000007f150bd6f54c40a34d7c3d5e9f56",
-        "0x00000000b7ca7e12dcc72290d1fe47b2ef14c607",
-        "0x0000006daea1723962647b7e189d311d757fb793"
-      ]
-    }
-  ) {
-    id
-    tokens (
-      where: {
-        category: "Lending"
-        balance_gt: 0
-      }
-    ) {
-      symbol
-      balance
-    }
-  }
-}
-```
-
-### Get token balance at specified block number
-```
-{
-  accounts(
-    where: {
-      id_in: [
-        "0x0000000000007f150bd6f54c40a34d7c3d5e9f56",
-        "0x00000000b7ca7e12dcc72290d1fe47b2ef14c607",
-        "0x0000006daea1723962647b7e189d311d757fb793"
-      ]
-    }
+  user(
+    id: "0x574300348823910c6f82a6a3d859791b9cd0310e",
     block: {number: 12459565}
   ) {
+    balance
+  }
+}
+```
+
+### Get a user's balance, and approvals
+```
+{
+  user(id: "0x0000000000007f150bd6f54c40a34d7c3d5e9f56") {
     id
-    tokens {
-      symbol
-      balance
+    balance
+    approvals(where: {owner: "0x0000000000007f150bd6f54c40a34d7c3d5e9f56"}) {
+      id
+      count
+      value
     }
   }
 }
+
 ```
