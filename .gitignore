@@ -3,3 +3,4 @@ node_modules
 src/types
 build/
 package-lock.json
+subgraph.yaml
