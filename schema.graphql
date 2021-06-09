@@ -10,36 +10,14 @@ type Asset @entity {
     symbol: String!
     "Token decimals"
     decimals: Int!
-    "Defi asset category"
-    category: String!
 }
 
 """
-Account is an ETH address, with a list of all Token assets the account has
+User is a single ethereum address and related information
 """
-type Account @entity {
-    "User ETH address"
+type User @entity {
+    "User wallet address"
     id: ID!
-    "Array of Tokens user is in"
-    tokens: [AccountToken!]! @derivedFrom(field: "account")
-}
-
-"""
-AccountToken is a single account within a single Token asset
-"""
-type AccountToken @entity {
-    "Token address + User address"
-    id: ID!
-    "User address"
-    userID: String!
-    "Relation to asset"
-    asset: Asset!
-    "Symbol of the Token"
-    symbol: String!
-    "Relation to user"
-    account: Account!
-    "Defi asset category"
-    category: String!
     "Token balance of the user"
     balance: BigDecimal!
 }

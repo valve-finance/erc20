@@ -1,64 +1,58 @@
-import { BigDecimal } from '@graphprotocol/graph-ts'
-import { Transfer } from '../types/DAI/Token'
-import { Asset, Account, } from '../types/schema'
-import { DeFiCategory } from './constants'
+import { BigDecimal, log } from '@graphprotocol/graph-ts'
+import { Asset, User, } from '../types/schema'
 import { createAsset } from './assets'
+import {
+  Transfer
+} from '../types/ERC20/Token'
 
 import {
-  createAccount,
-  exponentToBigDecimal,
-  updateCommonTokenStats
+  createUser,
+  updateUserStats,
+  exponentToBigDecimal
 } from './helpers'
 
 export function handleTransfer(event: Transfer): void {
+  // this is the address specified in the subgraph.yaml file
   let assetID = event.address.toHexString()
   let asset = Asset.load(assetID)
   if (asset == null) {
     asset = createAsset(assetID)
     asset.save()
   }
-  let TokenDecimals = asset.decimals
-  let TokenDecimalsBD: BigDecimal = exponentToBigDecimal(TokenDecimals)
-  let accountFromID = event.params.from.toHex()
-  if (accountFromID != assetID) {
-    let accountFrom = Account.load(accountFromID)
-    if (accountFrom == null) {
-      createAccount(accountFromID)
+  let AssetDecimals = asset.decimals
+  let AssetDecimalsBD: BigDecimal = exponentToBigDecimal(AssetDecimals)
+  let userFromID = event.params.from.toHex()
+  if (userFromID != assetID) {
+    let UserStatsFrom = User.load(userFromID)
+    if (UserStatsFrom == null) {
+      UserStatsFrom = createUser(userFromID)
     }
-    let TokenStatsFrom = updateCommonTokenStats(
-      asset.id,
-      asset.symbol,
-      accountFromID
-    )
-    TokenStatsFrom.balance = TokenStatsFrom.balance.minus(
+    else {
+      UserStatsFrom = updateUserStats(userFromID)
+    }
+    UserStatsFrom.balance = UserStatsFrom.balance.minus(
       event.params.value
         .toBigDecimal()
-        .div(TokenDecimalsBD)
-        .truncate(TokenDecimals),
+        .div(AssetDecimalsBD)
+        .truncate(AssetDecimals),
     )
-    TokenStatsFrom.category = DeFiCategory.get(assetID) as string
-    TokenStatsFrom.userID = accountFromID
-    TokenStatsFrom.save()
+    UserStatsFrom.save()
   }
-  let accountToID = event.params.to.toHex()
-  if (accountToID != assetID) {
-    let accountTo = Account.load(accountToID)
-    if (accountTo == null) {
-      createAccount(accountToID)
+  let userToID = event.params.to.toHex()
+  if (userToID != assetID) {
+    let UserStatsTo = User.load(userToID)
+    if (UserStatsTo == null) {
+      UserStatsTo = createUser(userToID)
     }
-    let TokenStatsTo = updateCommonTokenStats(
-      asset.id,
-      asset.symbol,
-      accountToID
-    )
-    TokenStatsTo.balance = TokenStatsTo.balance.plus(
+    else {
+      UserStatsTo = updateUserStats(userToID)
+    }
+    UserStatsTo.balance = UserStatsTo.balance.plus(
       event.params.value
         .toBigDecimal()
-        .div(TokenDecimalsBD)
-        .truncate(TokenDecimals),
+        .div(AssetDecimalsBD)
+        .truncate(AssetDecimals),
     )
-    TokenStatsTo.category = DeFiCategory.get(assetID) as string
-    TokenStatsTo.userID = accountToID
-    TokenStatsTo.save()
+    UserStatsTo.save()
   }
 }

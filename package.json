@@ -1,17 +1,15 @@
 {
   "name": "defi-balance",
   "version": "1.0.0",
-  "repository": "https://github.com/valve-finance/defi-balance",
+  "repository": "https://github.com/valve-finance/erc20",
   "license": "MIT",
   "scripts": {
-    "codegen": "graph codegen --output-dir src/types/",
+    "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "codegen": "graph -r dotenv/config codegen --output-dir src/types/",
     "build": "graph build --ipfs https://api.staging.thegraph.com/ipfs/ ",
-    "create-local": "graph create $YOUR_SUB_GRAPH --node http://127.0.0.1:8020",
-    "deploy-local": "graph deploy $YOUR_SUB_GRAPH --debug --ipfs http://localhost:5001 --node http://127.0.0.1:8020/",
-    "deploy": "graph deploy $YOUR_SUB_GRAPH --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token $YOUR_GRAPH_ACCESS_TOKEN",
-    "deploy-staging": "graph deploy --debug --ipfs https://api.staging.thegraph.com/ipfs/ --node https://api.staging.thegraph.com/deploy/ $YOUR_SUB_GRAPH",
+    "deploy": "dotenv -- cross-var \"graph deploy %SLUG% --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token %ACCESS_TOKEN%\"",
     "prettier": "./node_modules/.bin/prettier —-write '**/*.ts'",
-    "launch": "npm run codegen && npm run build && npm run deploy"
+    "launch": "npm run prepare:mainnet && npm run codegen && npm run build && npm run deploy"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.18.0",
@@ -20,10 +18,10 @@
     "@typescript-eslint/parser": "^2.0.0",
     "eslint": "^6.2.2",
     "eslint-config-prettier": "^6.1.0",
-    "prettier": "^1.18.2",
-    "typescript": "^3.5.2",
     "husky": "^3.0.5",
-    "lint-staged": "^9.2.5"
+    "lint-staged": "^9.2.5",
+    "prettier": "^1.18.2",
+    "typescript": "^3.5.2"
   },
   "husky": {
     "hooks": {
@@ -35,5 +33,10 @@
       "prettier --write --config ./.prettierrc",
       "git add"
     ]
+  },
+  "dependencies": {
+    "cross-var": "^1.1.0",
+    "dotenv-cli": "^4.0.0",
+    "mustache": "^4.2.0"
   }
 }

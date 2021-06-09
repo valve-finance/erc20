@@ -1,5 +1,5 @@
 import { BigDecimal } from '@graphprotocol/graph-ts'
-import { AccountToken, Account } from '../types/schema'
+import { User } from '../types/schema'
 
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
   let bd = BigDecimal.fromString('1')
@@ -11,38 +11,21 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
 
 export let zeroBD = BigDecimal.fromString('0')
 
-export function createAccountToken(
-  TokenStatsID: string,
-  TokenUserID: string,
-  symbol: string,
-  account: string,
-  assetID: string,
-): AccountToken {
-  let TokenStats = new AccountToken(TokenStatsID)
-  TokenStats.symbol = symbol
-  TokenStats.asset = assetID
-  TokenStats.account = account
-  TokenStats.balance = zeroBD
-  TokenStats.userID = TokenUserID
-  return TokenStats
+export function createUser(
+  userId: string
+): User {
+  let UserStats = new User(userId)
+  UserStats.balance = zeroBD
+  UserStats.save()
+  return UserStats as User
 }
 
-export function createAccount(accountID: string): Account {
-  let account = new Account(accountID)
-  account.save()
-  return account
-}
-
-export function updateCommonTokenStats(
-  assetID: string,
-  assetSymbol: string,
-  accountID: string
-): AccountToken {
-  let TokenStatsID = assetID.concat('-').concat(accountID)
-  let TokenUserID = accountID
-  let TokenStats = AccountToken.load(TokenStatsID)
-  if (TokenStats == null) {
-    TokenStats = createAccountToken(TokenStatsID, TokenUserID, assetSymbol, accountID, assetID)
+export function updateUserStats(
+  userId: string
+): User {
+  let UserStats = User.load(userId)
+  if (UserStats == null) {
+    UserStats = createUser(userId)
   }
-  return TokenStats as AccountToken
+  return UserStats as User
 }

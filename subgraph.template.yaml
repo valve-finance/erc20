@@ -6,11 +6,11 @@ schema:
 dataSources:
   - name: ERC20
     kind: ethereum/contract
-    network: mainnet
+    network: {{network}}
     source:
-      address: '0x6dea81c8171d0ba574754ef6f8b412f2ed88c54d'
+      address: '{{address}}'
       abi: Token
-      startBlock: 12178618
+      startBlock: {{block}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
